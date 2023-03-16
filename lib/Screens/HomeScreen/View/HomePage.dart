@@ -1,8 +1,15 @@
+import 'dart:io';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:focused_menu/focused_menu.dart';
+import 'package:focused_menu/modals.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
+import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
 import 'package:sizer/sizer.dart';
 
@@ -48,6 +55,10 @@ class _HomePageState extends State<HomePage> {
                     {
                       homeController.DropdownValue.value = homeController.CategoryList[0].Category!;
                     }
+                    homeController.check.value = 0;
+                    homeController.Quotecheck.value = 0;
+                    homeController.Tabindex.value = 0;
+
                     Get.toNamed('Tab');
                   },
                   icon: Icon(
@@ -374,64 +385,102 @@ class _HomePageState extends State<HomePage> {
                                   physics: BouncingScrollPhysics(),
                                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 1,crossAxisSpacing: Get.width/70,mainAxisSpacing: Get.width/70,mainAxisExtent: Get.height/4.8),
                                   itemBuilder: (context, index) {
-                                    return InkWell(
-                                      onTap: () async {
-                                        // homeController.GetData2();
-                                        homeController.CategoryId.value = homeController.CategoryList[index].id!;
-                                        List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
-                                        homeController.QuotesList.clear();
-                                        for(int i=0; i<DataList.length; i++)
-                                        {
-                                          if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                                    return FocusedMenuHolder(
+                                      menuItems: [
+                                        FocusedMenuItem(title: const Text("Update"), onPressed: (){
+                                          homeController.check.value = 1;
+                                          homeController.imagePath.value = "fgdf";
+                                          homeController.check2.value = 1;
+                                          homeController.CateId.value = homeController.CategoryList[index].id!;
+                                          homeController.txtUpdateCategory.value = TextEditingController(text: homeController.CategoryList[index].Category);
+                                          homeController.imagepath.value = homeController.CategoryList[index].image!;
+                                          print("=========== ${homeController.imagepath.value}");
+                                          Get.toNamed('Tab');
+                                          // // Uint8List image = homeController.CategoryList[index].image!;
+                                          // File image = File.fromRawPath(homeController.CategoryList[index].image!);
+                                          // homeController.imagePath.value = image.path;
+                                        }),
+                                        FocusedMenuItem(title: const Text("Delete"), onPressed: () async {
+                                          homeController.CategoryId.value = homeController.CategoryList[index].id!;
+                                          List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
+                                          homeController.QuotesList.clear();
+                                          for(int i=0; i<DataList.length; i++)
                                           {
-                                            homeController.QuotesList.add(DataList[i]['quote']);
+                                            if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                                            {
+                                              // homeController.QuotesList.add(DataList[i]['quote']);
+                                              print("========== ${DataList[i]['category_id']}");
+                                              QuotesDatabase.quotesDatabase.DeleteQuoteData(id: DataList[i]['category_id']);
+                                            }
                                           }
-                                        }
-                                        // homeController.QuotesList.value = homeController.CategoryList[index].c;
-                                        homeController.QuotesCategory.value = homeController.CategoryList[index].Category!;
-                                        Get.toNamed('AllQ');
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.red,
-                                            borderRadius: BorderRadius.circular(15),
-                                            boxShadow: [
-                                              BoxShadow(
-                                                  color: Colors.black45,
-                                                  offset: Offset(0,0),
-                                                  blurRadius: 5
-                                              )
-                                            ]
-                                        ),
-                                        // alignment: Alignment.center,
-                                        child: Stack(
-                                          children: [
-                                            Container(
-                                              height: Get.height,
-                                              width: Get.width,
-                                              child: ClipRRect(
-                                                borderRadius: BorderRadius.circular(15),
-                                                child: Image.memory(homeController.CategoryList[index].image!,fit: BoxFit.fill,),
+                                          CategoryDatabse.categoryDatabse.DeleteDatabase(id: homeController.CategoryList[index].id!);
+                                          homeController.GetData();
+                                          homeController.GetData2();
+                                        }),
+                                      ],
+                                      child: InkWell(
+                                        onTap: () async {
+                                          // homeController.GetData2();
+                                          homeController.CategoryId.value = homeController.CategoryList[index].id!;
+                                          List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
+                                          homeController.QuotesList.clear();
+                                          homeController.QuotesIdList.clear();
+                                          for(int i=0; i<DataList.length; i++)
+                                          {
+                                            if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                                            {
+                                              homeController.QuotesList.add(DataList[i]['quote']);
+                                              homeController.QuotesIdList.add(DataList[i]['id']);
+                                            }
+                                          }
+                                          print("======== ccgfd ${homeController.QuotesIdList}");
+                                          // homeController.QuotesList.value = homeController.CategoryList[index].c;
+                                          homeController.QuotesCategory.value = homeController.CategoryList[index].Category!;
+                                          Get.toNamed('AllQ');
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.red,
+                                              borderRadius: BorderRadius.circular(15),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.black45,
+                                                    offset: Offset(0,0),
+                                                    blurRadius: 5
+                                                )
+                                              ]
+                                          ),
+                                          // alignment: Alignment.center,
+                                          child: Stack(
+                                            children: [
+                                              Container(
+                                                height: Get.height,
+                                                width: Get.width,
+                                                child: ClipRRect(
+                                                  borderRadius: BorderRadius.circular(15),
+                                                  child: Image.memory(homeController.CategoryList[index].image!,fit: BoxFit.fill,),
+                                                ),
                                               ),
-                                            ),
-                                            Align(
-                                              alignment: Alignment.center,
-                                              child: Padding(
-                                                padding: EdgeInsets.symmetric(horizontal: Get.width/60),
-                                                child: Text(
-                                                  "${homeController.CategoryList[index].Category!} Quotes",
-                                                  maxLines: 3,
-                                                  style: GoogleFonts.lobster(
-                                                      color: Colors.white,
-                                                      fontSize: 15.sp,
-                                                      textStyle: TextStyle(overflow: TextOverflow.ellipsis)
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Padding(
+                                                  padding: EdgeInsets.symmetric(horizontal: Get.width/60),
+                                                  child: Text(
+                                                    "${homeController.CategoryList[index].Category!} Quotes",
+                                                    maxLines: 3,
+                                                    style: GoogleFonts.lobster(
+                                                        color: Colors.white,
+                                                        fontSize: 15.sp,
+                                                        textStyle: TextStyle(overflow: TextOverflow.ellipsis)
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
+                                            ],
+                                          ),
                                         ),
                                       ),
+                                      onPressed: (){},
                                     );
                                   },
                                 ),

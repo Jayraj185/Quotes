@@ -49,26 +49,28 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                       borderRadius: BorderRadius.circular(30)),
                   margin: EdgeInsets.only(left: Get.width / 21, right: Get.width / 21, top:  Get.height / 90),
                   padding: EdgeInsets.only(left: Get.width/21),
-                  child: TextFormField(
-                    controller: homeController.txtAddCategory.value,
-                    style: GoogleFonts.lobster(),
-                    cursorColor: Colors.black,
-                    decoration: InputDecoration(
-                      border: InputBorder.none,
-                      hintText: "Quotes Category Required*",
-                      // prefix: Container(),
-                      // prefixIconColor: Colors.black,
-                      hintStyle: GoogleFonts.lobster(),
+                  child: Obx(
+                    () => TextFormField(
+                      controller: homeController.check.value == 0 ? homeController.txtAddCategory.value : homeController.txtUpdateCategory.value,
+                      style: GoogleFonts.lobster(),
+                      cursorColor: Colors.black,
+                      decoration: InputDecoration(
+                        border: InputBorder.none,
+                        hintText: "Quotes Category Required*",
+                        // prefix: Container(),
+                        // prefixIconColor: Colors.black,
+                        hintStyle: GoogleFonts.lobster(),
+                      ),
+                      validator: (value) {
+                        if(value!.isEmpty)
+                        {
+                          return "Required* Please Add This Value";
+                        }
+                        else {
+                          return null;
+                        }
+                      },
                     ),
-                    validator: (value) {
-                      if(value!.isEmpty)
-                      {
-                        return "Required* Please Add This Value";
-                      }
-                      else {
-                        return null;
-                      }
-                    },
                   ),
                 ),
                 Container(
@@ -83,18 +85,23 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                         child: Container(
                           height: Get.height/5,
                           width: Get.height/5,
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                               color: Colors.red,
                               shape: BoxShape.circle
                           ),
                           alignment: Alignment.center,
                           child: Obx(() => homeController.imagePath.isEmpty
                               ? Text("Required*",style: GoogleFonts.lobster(color: Colors.black,fontSize: 15.sp),)
+                              : homeController.check2.value == 0
+                              ? CircleAvatar(
+                            radius: Get.height/5,
+                            backgroundImage: FileImage(File("${homeController.imagePath}"),),
+                          )
                               : CircleAvatar(
                             radius: Get.height/5,
-                            backgroundImage: FileImage(File("${homeController.imagePath}"),
-                            ),
-                          )),
+                            backgroundImage: MemoryImage(homeController.imagepath.value),
+                           )
+                          ),
                         ),
                       ),
                       Align(
@@ -133,7 +140,9 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                                             IconButton(onPressed: () async {
                                               ImagePicker imagePicker = ImagePicker();
                                               XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
+                                              homeController.check2.value = 0;
                                               homeController.imagePath.value = image!.path;
+                                              print("=========== CHECK ${homeController.check2.value}");
                                             }, icon: Icon(Icons.image_outlined,color: Colors.black,)),
                                           ],
                                         ),
@@ -148,7 +157,7 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                             height: Get.height/18,
                             width: Get.height/18,
                             margin: EdgeInsets.only(right: Get.width/18,bottom: Get.height/60),
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                                 boxShadow: [
                                   BoxShadow(
                                       color: Colors.grey,
@@ -189,8 +198,23 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                       //         CategoryDatabse.categoryDatabse.InsertDatabase(Category: homeController.txtAddCategory.value.text,image: homeController.imagePath.value);
                       //       }
                       //   }
-                      CategoryDatabse.categoryDatabse.InsertDatabase(Category: homeController.txtAddCategory.value.text,image: homeController.imagePath.value);
-                      homeController.CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
+                      if(homeController.check.value == 0)
+                        {
+                          CategoryDatabse.categoryDatabse.InsertDatabase(Category: homeController.txtAddCategory.value.text,image: homeController.imagePath.value);
+                          homeController.CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
+                        }
+                      else
+                        {
+                          if(homeController.check2.value == 0)
+                            {
+                              CategoryDatabse.categoryDatabse.UpdateDatabase(Category: homeController.txtUpdateCategory.value.text,image: homeController.imagePath.value,id: homeController.CateId.value);
+                            }
+                          else
+                            {
+                              CategoryDatabse.categoryDatabse.UpdateBIDatabase(Category: homeController.txtUpdateCategory.value.text,image: homeController.imagepath.value,id: homeController.CateId.value);
+                            }
+                          homeController.CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
+                        }
                       homeController.GetData();
                       homeController.key.value.currentState!.reset();
                       homeController.imagePath.value = "";
@@ -210,7 +234,7 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                       margin: EdgeInsets.only(left: Get.width / 21, right: Get.width / 21, top:  Get.height / 30),
                       alignment: Alignment.center,
                       child: Text(
-                        "Add Category",
+                        "${homeController.check.value == 0 ? "Add" : "Update"} Category",
                         style: GoogleFonts.lobster(
                             fontSize: 15.sp,
                             color: Colors.black

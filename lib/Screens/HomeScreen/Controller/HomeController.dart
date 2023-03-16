@@ -1,7 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:quotes/Screens/CategoryAddScreen/View/CategoryAddPage.dart';
 import 'package:quotes/Screens/QuotesAddScreen/Model/CategoryModel.dart';
+import 'package:quotes/Screens/QuotesAddScreen/View/QuotesAddPage.dart';
 import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
 
@@ -139,7 +143,9 @@ class HomeController extends GetxController
   Rx<GlobalKey<FormState>> key = GlobalKey<FormState>().obs;
   Rx<GlobalKey<FormState>> key2 = GlobalKey<FormState>().obs;
   Rx<TextEditingController> txtAddCategory = TextEditingController().obs;
+  Rx<TextEditingController> txtUpdateCategory = TextEditingController().obs;
   Rx<TextEditingController> txtAddQuotes = TextEditingController().obs;
+  Rx<TextEditingController> txtUpdateQuotes = TextEditingController().obs;
   RxString DropdownValue = "".obs;
   RxList<CategoryModel> CategoryList = <CategoryModel>[].obs;
   RxList ViewImageBackList = [
@@ -162,9 +168,19 @@ class HomeController extends GetxController
   RxInt ImageBackIndex = 0.obs;
   RxString QuotesData = "".obs;
   RxList QuotesList = [].obs;
+  RxList QuotesIdList = [].obs;
+  RxList Screens = [
+    CategoryAddPage(),
+    QuotesAddPage(),
+  ].obs;
   RxString QuotesCategory = "".obs;
   RxInt CategoryId = 0.obs;
-
+  RxInt QuoteId = 0.obs;
+  RxInt check = 0.obs;
+  RxInt check2 = 0.obs;
+  RxInt Quotecheck = 0.obs;
+  RxInt CateId = 0.obs;
+  Rx<Uint8List> imagepath = Uint8List(0).obs;
   void GetData() async
   {
     CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();

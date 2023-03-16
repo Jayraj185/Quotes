@@ -47,28 +47,37 @@ class _TabBarPageState extends State<TabBarPage> with TickerProviderStateMixin{
           elevation: 0,
           title: Obx(() => Text("Add Quotes ${homeController.Tabindex.value == 0 ? "Category" : ""}",style: GoogleFonts.lobster(color: Colors.black),)),
           centerTitle: true,
-          bottom: TabBar(
-            onTap: (value) {
-              homeController.Tabindex.value = value;
-            },
-            indicatorColor: Colors.black,
-            indicatorSize: TabBarIndicatorSize.label,
-            labelStyle: GoogleFonts.lobster(),
-            labelColor: Colors.black,
-            unselectedLabelStyle: GoogleFonts.lobster(),
-            unselectedLabelColor: Colors.grey,
-            tabs: [
-              Tab(text: "Add Quotes Category",),
-              Tab(text: "Add Quotes",),
-            ],
+          bottom: PreferredSize(
+            preferredSize: Size.fromHeight(40),
+            child: Obx(
+                () => TabBar(
+                controller: TabController(length: 2, vsync: this, initialIndex: homeController.Tabindex.value),
+                onTap: (value) {
+                  homeController.Tabindex.value = value;
+                },
+                indicatorColor: Colors.black,
+                indicatorSize: TabBarIndicatorSize.label,
+                labelStyle: GoogleFonts.lobster(),
+                labelColor: Colors.black,
+                unselectedLabelStyle: GoogleFonts.lobster(),
+                unselectedLabelColor: Colors.grey,
+                tabs: [
+                  Tab(text: "Add Quotes Category",),
+                  Tab(text: "Add Quotes",),
+                ],
+              ),
+            ),
           ),
         ),
-        body: TabBarView(
-          physics: BouncingScrollPhysics(),
-          children: [
-            CategoryAddPage(),
-            QuotesAddPage(),
-          ],
+        body: Obx(
+          () => TabBarView(
+            physics: BouncingScrollPhysics(),
+            controller: TabController(length: 2, vsync: this, initialIndex: homeController.Tabindex.value,),
+            children: [
+              CategoryAddPage(),
+              QuotesAddPage(),
+            ],
+          ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Screens/QuotesAddScreen/Model/CategoryModel.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:sqflite/sqlite_api.dart';
@@ -41,10 +42,12 @@ class CategoryDatabse
     );
   }
 
+  //Insert Data In Database
   void InsertDatabase({required String Category, String? image}) async
   {
 
     database = await CheckDatabase();
+
     Uint8List? Image;
 
     File file = File("$image");
@@ -57,6 +60,7 @@ class CategoryDatabse
   }
 
 
+  //Read Data In Database
   Future<List<CategoryModel>> ReadDatabase() async
   {
     database = await CheckDatabase();
@@ -68,5 +72,35 @@ class CategoryDatabse
     return Data;
 
 
+  }
+
+  //Delete Data In Database
+  Future<void> DeleteDatabase({required int id})
+  async {
+    database = await CheckDatabase();
+
+    database!.delete('category',where: "id = ?",whereArgs: [id]);
+  }
+
+  //Update Data In Database(Simple Image)
+  Future<void> UpdateDatabase({required int id, required String Category, required String image})
+  async {
+    database = await CheckDatabase();
+    Uint8List? Image;
+
+    File file = File("$image");
+    await file.readAsBytes().then((value) {
+    Image = value;
+    });
+
+    database!.update('category', {'categorytypes' : Category, 'image' : Image},whereArgs: [id],where: "id = ?");
+  }
+
+  //Update Data In Database(Blob Image)
+  Future<void> UpdateBIDatabase({required int id, required String Category, required Uint8List image})
+  async {
+    database = await CheckDatabase();
+
+    database!.update('category', {'categorytypes' : Category, 'image' : image},whereArgs: [id],where: "id = ?");
   }
 }

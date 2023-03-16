@@ -23,14 +23,11 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
   @override
   void initState() {
     super.initState();
-    homeController.CategoryId.value = 0;
+    homeController.Quotecheck.value == 0 ? homeController.CategoryId.value = 0 : "";
     homeController.GetData();
     homeController.GetData2();
 
-    if(homeController.CategoryList.isNotEmpty)
-    {
-      homeController.DropdownValue.value = homeController.CategoryList[0].Category!;
-    }
+    homeController.Quotecheck.value == 0 ? homeController.CategoryList.isNotEmpty ? homeController.DropdownValue.value = homeController.CategoryList[0].Category! : "" : "";
   }
   @override
   Widget build(BuildContext context) {
@@ -52,7 +49,7 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
                   margin: EdgeInsets.only(left: Get.width / 21, right: Get.width / 21, top:  Get.height / 90),
                   padding: EdgeInsets.only(left: Get.width/21),
                   child: TextFormField(
-                    controller: homeController.txtAddQuotes.value,
+                    controller: homeController.Quotecheck.value == 0 ? homeController.txtAddQuotes.value : homeController.txtUpdateQuotes.value,
                     style: GoogleFonts.lobster(),
                     cursorColor: Colors.black,
                     decoration: InputDecoration(
@@ -98,19 +95,39 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
                               },
                             ),
                         ).toList(),
-                        value: "${homeController.DropdownValue}",
+                        value: homeController.DropdownValue.value,
                       ),
                     ),
                   ),
                 ),
                 GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     if(homeController.key2.value.currentState!.validate())
                     {
-                      print("==== ${homeController.CategoryId.value}   ${homeController.CategoryList[homeController.CategoryId.value].id}");
-                      QuotesDatabase.quotesDatabase.InsertQutesData(Quote: homeController.txtAddQuotes.value.text, Category_Id: homeController.CategoryList[homeController.CategoryId.value].id!);
-                      homeController.GetData2();
+                     if(homeController.Quotecheck.value == 0)
+                       {
+                         print("==== ${homeController.CategoryId.value}   ${homeController.CategoryList[homeController.CategoryId.value].id}");
+                         QuotesDatabase.quotesDatabase.InsertQutesData(Quote: homeController.txtAddQuotes.value.text, Category_Id: homeController.CategoryList[homeController.CategoryId.value].id!);
+                       }
+                     else
+                       {
+                         // print("====ELES ${homeController.CategoryId.value}   ${homeController.CategoryList[homeController.CategoryId.value].id}");
+                         QuotesDatabase.quotesDatabase.UpdateQuoteData(id: homeController.QuoteId.value,Quote: homeController.txtUpdateQuotes.value.text, Category_Id: homeController.CategoryId.value);
+                       }
+                       List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
+                       homeController.QuotesList.clear();
+                       homeController.QuotesIdList.clear();
+                       for(int i=0; i<DataList.length; i++)
+                       {
+                         if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                         {
+                           homeController.QuotesList.add(DataList[i]['quote']);
+                           homeController.QuotesIdList.add(DataList[i]['id']);
+                         }
+                       }
+                      homeController.GetData();
                       Get.back();
+                      homeController.txtAddQuotes.value.clear();
                       homeController.txtAddQuotes.value.clear();
                     }
                     else
@@ -127,7 +144,7 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
                       margin: EdgeInsets.only(left: Get.width / 21, right: Get.width / 21, top:  Get.height / 21),
                       alignment: Alignment.center,
                       child: Text(
-                        "Add Quotes",
+                        "${homeController.Quotecheck.value == 0 ? "Add" : "Update"} Quotes",
                         style: GoogleFonts.lobster(
                             fontSize: 15.sp,
                             color: Colors.black
