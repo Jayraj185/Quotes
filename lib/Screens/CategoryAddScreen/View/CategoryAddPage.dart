@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
+import 'package:quotes/Utils/ToastMessage.dart';
 import 'package:sizer/sizer.dart';
 
 class CategoryAddPage extends StatefulWidget {
@@ -133,13 +134,13 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                                           children: [
                                             IconButton(onPressed: () async {
                                               ImagePicker imagePicker = ImagePicker();
-                                              XFile? image = await imagePicker.pickImage(source: ImageSource.camera);
+                                              XFile? image = await imagePicker.pickImage(source: ImageSource.camera,imageQuality: 0,);
                                               homeController.imagePath.value = image!.path;
                                             }, icon: Icon(Icons.camera_enhance_outlined,color: Colors.black,)),
                                             SizedBox(width: Get.width/21,),
                                             IconButton(onPressed: () async {
                                               ImagePicker imagePicker = ImagePicker();
-                                              XFile? image = await imagePicker.pickImage(source: ImageSource.gallery);
+                                              XFile? image = await imagePicker.pickImage(source: ImageSource.gallery,imageQuality: 0);
                                               homeController.check2.value = 0;
                                               homeController.imagePath.value = image!.path;
                                               print("=========== CHECK ${homeController.check2.value}");
@@ -201,6 +202,7 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                       if(homeController.check.value == 0)
                         {
                           CategoryDatabse.categoryDatabse.InsertDatabase(Category: homeController.txtAddCategory.value.text,image: homeController.imagePath.value);
+                          ToastMessage(msg: "Your Category Is Insert Successfully", color: Colors.green);
                           homeController.CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
                         }
                       else
@@ -208,10 +210,12 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                           if(homeController.check2.value == 0)
                             {
                               CategoryDatabse.categoryDatabse.UpdateDatabase(Category: homeController.txtUpdateCategory.value.text,image: homeController.imagePath.value,id: homeController.CateId.value);
+                              ToastMessage(msg: "Your Data Is Update Successfully", color: Colors.green);
                             }
                           else
                             {
                               CategoryDatabse.categoryDatabse.UpdateBIDatabase(Category: homeController.txtUpdateCategory.value.text,image: homeController.imagepath.value,id: homeController.CateId.value);
+                              ToastMessage(msg: "Your Data Is Update Successfully", color: Colors.green);
                             }
                           homeController.CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
                         }
@@ -222,7 +226,7 @@ class _CategoryAddPageState extends State<CategoryAddPage> {
                     }
                     else
                     {
-                      Get.snackbar('Alert', "Please Add Your Data");
+                      ToastMessage(msg: "Please Add Your Data", color: Colors.red);
                     }
                   },
                   child: Container(

@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
+import 'package:quotes/Utils/ToastMessage.dart';
 import 'package:sizer/sizer.dart';
 
 class HomePage extends StatefulWidget {
@@ -267,9 +268,10 @@ class _HomePageState extends State<HomePage> {
                               return InkWell(
                                 onTap: () {
                                   // homeController.QuotesList.clear();
-                                  homeController.QuotesList.value = homeController.PopularQuotes[index]['quotes'];
+                                  List dataList = homeController.PopularQuotes[index]['quotes'];
+                                  print("=============$index LISTTTT $dataList");
+                                  homeController.QuotesList.value = dataList;
                                   homeController.QuotesCategory.value = homeController.PopularQuotes[index]['category'];
-
                                   Get.toNamed('AllQ');
                                 },
                                 child: Container(
@@ -389,7 +391,8 @@ class _HomePageState extends State<HomePage> {
                                       menuItems: [
                                         FocusedMenuItem(title: const Text("Update"), onPressed: (){
                                           homeController.check.value = 1;
-                                          homeController.imagePath.value = "fgdf";
+                                          homeController.Tabindex.value = 0;
+                                          homeController.imagePath.value = "123";
                                           homeController.check2.value = 1;
                                           homeController.CateId.value = homeController.CategoryList[index].id!;
                                           homeController.txtUpdateCategory.value = TextEditingController(text: homeController.CategoryList[index].Category);
@@ -414,6 +417,7 @@ class _HomePageState extends State<HomePage> {
                                             }
                                           }
                                           CategoryDatabse.categoryDatabse.DeleteDatabase(id: homeController.CategoryList[index].id!);
+                                          ToastMessage(msg: "Your Category Is Delete Successfully", color: Colors.red);
                                           homeController.GetData();
                                           homeController.GetData2();
                                         }),

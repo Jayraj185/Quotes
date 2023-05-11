@@ -54,6 +54,7 @@ class _TabBarPageState extends State<TabBarPage> with TickerProviderStateMixin{
                 controller: TabController(length: 2, vsync: this, initialIndex: homeController.Tabindex.value),
                 onTap: (value) {
                   homeController.Tabindex.value = value;
+                  print("=========== $value");
                 },
                 indicatorColor: Colors.black,
                 indicatorSize: TabBarIndicatorSize.label,
@@ -71,6 +72,7 @@ class _TabBarPageState extends State<TabBarPage> with TickerProviderStateMixin{
         ),
         body: Obx(
           () => TabBarView(
+
             physics: BouncingScrollPhysics(),
             controller: TabController(length: 2, vsync: this, initialIndex: homeController.Tabindex.value,),
             children: [

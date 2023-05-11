@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
+import 'package:quotes/Utils/ToastMessage.dart';
 import 'package:sizer/sizer.dart';
 
 class QuotesAddPage extends StatefulWidget {
@@ -108,11 +109,13 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
                        {
                          print("==== ${homeController.CategoryId.value}   ${homeController.CategoryList[homeController.CategoryId.value].id}");
                          QuotesDatabase.quotesDatabase.InsertQutesData(Quote: homeController.txtAddQuotes.value.text, Category_Id: homeController.CategoryList[homeController.CategoryId.value].id!);
+                         ToastMessage(msg: "Your Data Is Insert Successfully", color: Colors.green);
                        }
                      else
                        {
                          // print("====ELES ${homeController.CategoryId.value}   ${homeController.CategoryList[homeController.CategoryId.value].id}");
                          QuotesDatabase.quotesDatabase.UpdateQuoteData(id: homeController.QuoteId.value,Quote: homeController.txtUpdateQuotes.value.text, Category_Id: homeController.CategoryId.value);
+                         ToastMessage(msg: "Your Data Is Update Successfully", color: Colors.green);
                        }
                        List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
                        homeController.QuotesList.clear();
@@ -132,7 +135,7 @@ class _QuotesAddPageState extends State<QuotesAddPage> {
                     }
                     else
                     {
-                      Get.snackbar('Alert', "Please Add Your Data");
+                      ToastMessage(msg: "Please Add Your Data", color: Colors.red);
                     }
                   },
                   child: Container(

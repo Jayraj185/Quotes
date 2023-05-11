@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
+import 'package:quotes/Utils/ToastMessage.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sizer/sizer.dart';
 
@@ -69,11 +70,12 @@ class _AllQuotesPageState extends State<AllQuotesPage> {
                     homeController.QuotesIdList.add(DataList[i]['id']);
                   }
                 }
+                ToastMessage(msg: "Quote Is Delete Successfully", color: Colors.red);
               })
             ],
             child: InkWell(
               onTap: () {
-                print("========= bdf ${homeController.QuotesIdList[index]}");
+                // print("========= bdf ${homeController.QuotesIdList[index]}");
                 homeController.QuotesData.value = homeController.QuotesList[index];
                 Get.toNamed('View');
               },
@@ -116,18 +118,20 @@ class _AllQuotesPageState extends State<AllQuotesPage> {
                             children: [
                               IconButton(
                                 onPressed: () {
+                                  ToastMessage(msg: "Quote Is Done", color: Colors.deepOrangeAccent.shade100);
                                 },
                                 icon: Icon(Icons.done_all,color: Colors.black,),
                               ),
                               IconButton(
                                 onPressed: () {
+                                  ToastMessage(msg: "Quote Is Stared", color: Colors.yellowAccent);
                                 },
                                 icon: Icon(Icons.star,color: Colors.black,),
                               ),
                               IconButton(
                                 onPressed: () async {
                                   await Clipboard.setData(ClipboardData(text: "${homeController.QuotesList[index]}"));
-                                  Get.snackbar('Thank You', "This Quotes Is Copied");
+                                  ToastMessage(msg: "Quote Is Copied", color: Colors.blueAccent);
                                 },
                                 icon: Icon(Icons.copy,color: Colors.black,),
                               ),
@@ -143,7 +147,7 @@ class _AllQuotesPageState extends State<AllQuotesPage> {
           );
         },
       )
-          : Center(child: Text("Value Not Available",style: GoogleFonts.lobster(color: Colors.black,fontSize: 15.sp),),),)
+          : Center(child: Text("Quotes Are Not Available",style: GoogleFonts.lobster(color: Colors.black,fontSize: 15.sp),),),)
     );
   }
 }

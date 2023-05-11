@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:quotes/Screens/HomeScreen/Controller/HomeController.dart';
 import 'package:quotes/Utils/DBHelper/CategoryDatabase.dart';
 import 'package:quotes/Utils/DBHelper/QuotesDatabase.dart';
+import 'package:quotes/Utils/ToastMessage.dart';
 import 'package:sizer/sizer.dart';
 
 class SeeAllQuotesPage extends StatefulWidget {
@@ -37,101 +38,106 @@ class _SeeAllQuotesPageState extends State<SeeAllQuotesPage> {
         centerTitle: true,
       ),
       backgroundColor: Colors.white,
-      body: ListView.builder(
-        physics: BouncingScrollPhysics(),
-        itemCount: homeController.CategoryList.length,
-        itemBuilder: (context, index) {
-          return FocusedMenuHolder(
-            menuItems: [
-              FocusedMenuItem(title: const Text("Update"), onPressed: (){
-                homeController.check.value = 1;
-                homeController.imagePath.value = "fgdf";
-                homeController.check2.value = 1;
-                homeController.CateId.value = homeController.CategoryList[index].id!;
-                homeController.txtUpdateCategory.value = TextEditingController(text: homeController.CategoryList[index].Category);
-                homeController.imagepath.value = homeController.CategoryList[index].image!;
-                print("=========== ${homeController.imagepath.value}");
-                Get.toNamed('Tab');
-                // // Uint8List image = homeController.CategoryList[index].image!;
-                // File image = File.fromRawPath(homeController.CategoryList[index].image!);
-                // homeController.imagePath.value = image.path;
-              }),
-              FocusedMenuItem(title: const Text("Delete"), onPressed: () async {
-                homeController.CategoryId.value = homeController.CategoryList[index].id!;
-                List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
-                homeController.QuotesList.clear();
-                for(int i=0; i<DataList.length; i++)
-                {
-                  if(DataList[i]['category_id'] == homeController.CategoryId.value)
+      body: Obx(
+        () => homeController.CategoryList.isNotEmpty
+            ? ListView.builder(
+          physics: BouncingScrollPhysics(),
+          itemCount: homeController.CategoryList.length,
+          itemBuilder: (context, index) {
+            return FocusedMenuHolder(
+              menuItems: [
+                FocusedMenuItem(title: const Text("Update"), onPressed: (){
+                  homeController.check.value = 1;
+                  homeController.imagePath.value = "fgdf";
+                  homeController.check2.value = 1;
+                  homeController.CateId.value = homeController.CategoryList[index].id!;
+                  homeController.txtUpdateCategory.value = TextEditingController(text: homeController.CategoryList[index].Category);
+                  homeController.imagepath.value = homeController.CategoryList[index].image!;
+                  print("=========== ${homeController.imagepath.value}");
+                  Get.toNamed('Tab');
+                  // // Uint8List image = homeController.CategoryList[index].image!;
+                  // File image = File.fromRawPath(homeController.CategoryList[index].image!);
+                  // homeController.imagePath.value = image.path;
+                }),
+                FocusedMenuItem(title: const Text("Delete"), onPressed: () async {
+                  homeController.CategoryId.value = homeController.CategoryList[index].id!;
+                  List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
+                  homeController.QuotesList.clear();
+                  for(int i=0; i<DataList.length; i++)
                   {
-                    // homeController.QuotesList.add(DataList[i]['quote']);
-                    print("========== ${DataList[i]['category_id']}");
-                    QuotesDatabase.quotesDatabase.DeleteQuoteData(id: DataList[index]['category_id']);
+                    if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                    {
+                      // homeController.QuotesList.add(DataList[i]['quote']);
+                      print("========== ${DataList[i]['category_id']}");
+                      QuotesDatabase.quotesDatabase.DeleteQuoteData(id: DataList[index]['category_id']);
+                    }
                   }
-                }
-                CategoryDatabse.categoryDatabse.DeleteDatabase(id: homeController.CategoryList[index].id!);
-                homeController.GetData();
-                homeController.GetData2();
-              }),
-            ],
-            child: InkWell(
-              onTap: () async {
-                homeController.CategoryId.value = homeController.CategoryList[index].id!;
-                List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
-                homeController.QuotesList.clear();
-                for(int i=0; i<DataList.length; i++)
-                {
-                  if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                  CategoryDatabse.categoryDatabse.DeleteDatabase(id: homeController.CategoryList[index].id!);
+                  homeController.GetData();
+                  // homeController.GetData2();
+                  ToastMessage(msg: "Quote Is Delete Successfully", color: Colors.blueAccent);
+                }),
+              ],
+              child: InkWell(
+                onTap: () async {
+                  homeController.CategoryId.value = homeController.CategoryList[index].id!;
+                  List DataList = await QuotesDatabase.quotesDatabase.ReadQuoteData();
+                  homeController.QuotesList.clear();
+                  for(int i=0; i<DataList.length; i++)
                   {
-                    homeController.QuotesList.add(DataList[i]['quote']);
+                    if(DataList[i]['category_id'] == homeController.CategoryId.value)
+                    {
+                      homeController.QuotesList.add(DataList[i]['quote']);
+                    }
                   }
-                }
-                // homeController.QuotesList.value = homeController.CategoryList[index].c;
-                homeController.QuotesCategory.value = homeController.CategoryList[index].Category!;
-                Get.toNamed('AllQ');
-              },
-              child: Container(
-                height: Get.height/3.6,
-                width: Get.width,
-                margin: EdgeInsets.all(Get.width/30),
-                decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(15),
-                    boxShadow: [
-                      BoxShadow(
-                          color: Colors.black54,
-                          offset: Offset(0,0),
-                          blurRadius: 6
-                      )
-                    ]
-                ),
-                child: Stack(
-                  children: [
-                    Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        height: Get.height/3.6,
-                        width: Get.width,
-                        child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.memory(homeController.CategoryList[index].image!,fit: BoxFit.fill,)),
-                      ),
-                    ),
-                    Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "${homeController.CategoryList[index].Category} Quotes",
-                        style: GoogleFonts.lobster(
-                            color: Colors.white,
-                            fontSize: 30.sp
+                  // homeController.QuotesList.value = homeController.CategoryList[index].c;
+                  homeController.QuotesCategory.value = homeController.CategoryList[index].Category!;
+                  Get.toNamed('AllQ');
+                },
+                child: Container(
+                  height: Get.height/3.6,
+                  width: Get.width,
+                  margin: EdgeInsets.all(Get.width/30),
+                  decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [
+                        BoxShadow(
+                            color: Colors.black54,
+                            offset: Offset(0,0),
+                            blurRadius: 6
+                        )
+                      ]
+                  ),
+                  child: Stack(
+                    children: [
+                      Align(
+                        alignment: Alignment.center,
+                        child: Container(
+                          height: Get.height/3.6,
+                          width: Get.width,
+                          child: ClipRRect(borderRadius: BorderRadius.circular(15), child: Image.memory(homeController.CategoryList[index].image!,fit: BoxFit.fill,)),
                         ),
                       ),
-                    ),
-                  ],
+                      Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          "${homeController.CategoryList[index].Category} Quotes",
+                          style: GoogleFonts.lobster(
+                              color: Colors.white,
+                              fontSize: 30.sp
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            onPressed: (){},
-          );
-        },
+              onPressed: (){},
+            );
+          },
+        )
+        : Center(child: Text("Category Are Not Available",style: GoogleFonts.lobster(color: Colors.black,fontSize: 15.sp),),),
       ),
     );
   }

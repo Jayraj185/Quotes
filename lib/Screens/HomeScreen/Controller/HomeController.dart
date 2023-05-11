@@ -183,6 +183,7 @@ class HomeController extends GetxController
   Rx<Uint8List> imagepath = Uint8List(0).obs;
   void GetData() async
   {
+    bool Data = false;
     CategoryList.value = await CategoryDatabse.categoryDatabse.ReadDatabase();
     update();
   }
